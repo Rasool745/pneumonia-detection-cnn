@@ -7,6 +7,17 @@ from werkzeug.utils import secure_filename
 from tensorflow.keras.models import Model
 from tensorflow.keras.layers import Input, Flatten, Dense, Dropout
 from tensorflow.keras.applications.vgg19 import VGG19
+from huggingface_hub import snapshot_download  # <--- Added this
+
+# --- NEW: Hugging Face Connection ---
+repo_id = "Rasool786/pneumonia-weights"
+local_weights_dir = "model_weights"
+
+# Check if weights exist locally; if not, download from Hugging Face
+if not os.path.exists(local_weights_dir):
+    print("Fetching model weights from Hugging Face... this may take a few minutes.")
+    snapshot_download(repo_id=repo_id, local_dir=local_weights_dir, repo_type="model")
+# -------------------------------------
 
 # Load VGG19 base model
 base_model = VGG19(include_top=False, input_shape=(128, 128, 3))
@@ -20,8 +31,10 @@ output = Dense(2, activation='softmax')(class_2)
 
 model_03 = Model(inputs=base_model.inputs, outputs=output)
 
-# Load trained weights
-model_03.load_weights('model_weights/vgg_unfrozen.h5')
+# Load trained weights from the downloaded folder
+# Note: snapshot_download might place them in a subfolder depending on your upload structure
+weights_file = os.path.join(local_weights_dir, "vgg_unfrozen.h5")
+model_03.load_weights(weights_file)
 
 # Create Flask app
 app = Flask(__name__)
@@ -78,6 +91,6 @@ def upload():
 
     return None
 
-
 if __name__ == '__main__':
+    # For local testing, keep debug=True. For final deployment, usually set to False.
     app.run(debug=True)

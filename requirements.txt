@@ -1,0 +1,7 @@
+flask
+tensorflow
+huggingface_hub
+opencv-python-headless
+pillow
+numpy
+werkzeug
