@@ -92,5 +92,5 @@ def upload():
     return None
 
 if __name__ == '__main__':
-    # For local testing, keep debug=True. For final deployment, usually set to False.
-    app.run(debug=True)
+    # host='0.0.0.0' allows the cloud server to access the app
+    app.run(host='0.0.0.0', port=7860)
